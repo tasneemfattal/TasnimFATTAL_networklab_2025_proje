@@ -19,6 +19,7 @@ public class GameClientGUI extends javax.swing.JFrame {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
+    private String playerName;
 
     /**
      * Creates new form GameClientGUI
@@ -77,7 +78,8 @@ public class GameClientGUI extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         // TODO add your handling code here:
-        String playerName = playerNameField.getText();
+        //String playerName = playerNameField.getText();
+        playerName = playerNameField.getText(); //Yani playerName değişkenini class seviyesinde tanımlamak
 
         if (!playerName.isEmpty()) {
             statusLabel.setText("Oyuncu: " + playerName + " - Hazır!");
@@ -93,6 +95,8 @@ public class GameClientGUI extends javax.swing.JFrame {
 
             // Server'a oyuncu adını gönderiyoruz
             out.println("JOIN " + playerName);  //
+            new Thread(() -> listenForMessages()).start();
+
 
             String response = in.readLine(); // Server'dan cevap bekleniyor
             statusLabel.setText("Server: " + response);
@@ -137,6 +141,32 @@ public class GameClientGUI extends javax.swing.JFrame {
             }
         });
     }
+    
+    
+    private void listenForMessages() {
+    try {
+        String serverMessage;
+        while ((serverMessage = in.readLine()) != null) {
+            System.out.println("Server'dan gelen: " + serverMessage);
+            if (serverMessage.equals("İki oyuncu hazır! Oyun başlıyor!")) {
+                openGameScreen();
+                break;
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+    }
+}
+
+    
+    private void openGameScreen() {
+    javax.swing.SwingUtilities.invokeLater(() -> {
+        GameScreen gameScreen = new GameScreen(playerName); 
+        gameScreen.setVisible(true);
+        this.dispose(); 
+    });
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
