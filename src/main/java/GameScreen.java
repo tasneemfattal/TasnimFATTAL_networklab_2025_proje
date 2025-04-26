@@ -1,20 +1,48 @@
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author tasni
  */
 public class GameScreen extends javax.swing.JFrame {
 
+    private PrintWriter out;
+    private String playerName;
+    private BufferedReader in;
+    private GameBoardPanel boardPanel;
+
     /**
      * Creates new form GameScreen
      */
-    public GameScreen(String playerName) {
+    public GameScreen(String playerName, PrintWriter out1, BufferedReader in) {
         initComponents();
+        this.playerName = playerName;
+        this.out = out1;
+        this.in = in;
         jLabelWelcome.setText("Oyun başladı, hoş geldin " + playerName + "!");
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        boardPanel = new GameBoardPanel();
+        jPanel1.add(boardPanel, java.awt.BorderLayout.CENTER);
+        jPanel1.revalidate();
+        jPanel1.repaint();
+        /*boardPanel = new GameBoardPanel();
+        jPanel1.setLayout(new java.awt.BorderLayout());  // 
+        jPanel1.add(boardPanel, java.awt.BorderLayout.CENTER);
+        jPanel1.revalidate();
+        jPanel1.repaint();*/
+
+        // Zar sonucu dinlemeye başla:
+        new Thread(() -> listenForMessages()).start();
+
     }
 
     /**
@@ -29,30 +57,39 @@ public class GameScreen extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabelWelcome = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jLabelDiceResult = new javax.swing.JLabel();
+        jLabelRollResult = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 690, 450));
 
         jLabelWelcome.setText("Oyun başladı, hoş geldin X!");
-        jPanel1.add(jLabelWelcome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(jLabelWelcome, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, -1));
 
         jButton1.setText("Zar At");
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 270, -1, -1));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 540, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        jLabelDiceResult.setText("sıra ...");
+        getContentPane().add(jLabelDiceResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 510, 170, 30));
+
+        jLabelRollResult.setText("Zar sonucu.....");
+        getContentPane().add(jLabelRollResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 540, 150, 30));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        out.println("ROLL " + playerName);  // Zar atma mesajını server'a yolluyoruz
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -82,7 +119,7 @@ public class GameScreen extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        /*java.awt.EventQueue.invokeLater(new Runnable() {
+ /*java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 String playerName = null;
                 new GameScreen(playerName).setVisible(true);
@@ -90,8 +127,109 @@ public class GameScreen extends javax.swing.JFrame {
         }); }*/
     }
 
+    private void listenForMessages() {
+        try {
+            String serverMessage;
+            while ((serverMessage = in.readLine()) != null) {
+                System.out.println("Server'dan gelen: " + serverMessage);
+                final String messageToShow = serverMessage;
+
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    if (messageToShow.startsWith("SIRA ")) {
+                        String currentTurnPlayer = messageToShow.substring(5);  // "SIRA tasnim"
+                        if (currentTurnPlayer.equals(playerName)) {
+                            jButton1.setEnabled(true);  // Sıra sende
+                            jLabelDiceResult.setText("Senin sıran! Zar atabilirsin.");
+                        } else {
+                            jButton1.setEnabled(false);  // Sıra diğer oyuncuda
+                            jLabelDiceResult.setText("Şu an " + currentTurnPlayer + " oynuyor, bekle.");
+                        }
+                    } // Zar sonucu mesajı:
+                    else if (messageToShow.startsWith("Oyuncu ")) {
+                        jLabelRollResult.setText(messageToShow);  // Zar sonucunu ayrı label'a yaz!
+                    } else {
+                        // Diğer mesajlar (gerekirse)
+                        jLabelDiceResult.setText(messageToShow);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+
+        }
+        /*  try {
+        String serverMessage;
+        while ((serverMessage = in.readLine()) != null) {
+            System.out.println("Server'dan gelen: " + serverMessage);
+            final String messageToShow = serverMessage;
+
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                if (messageToShow.startsWith("SIRA ")) {
+                    String currentTurnPlayer = messageToShow.substring(5);  // "SIRA tasnim"
+                    if (currentTurnPlayer.equals(playerName)) {
+                        jButton1.setEnabled(true);  // Sıra sende
+                        jLabelDiceResult.setText("Senin sıran! Zar atabilirsin.");
+                    } else {
+                        jButton1.setEnabled(false);  // Sıra diğer oyuncuda
+                        jLabelDiceResult.setText("Şu an " + currentTurnPlayer + " oynuyor, bekle.");
+                    }
+                } else {
+                    // Zar sonucu vs.  JLabel'a yazıyoruz!.
+                    jLabelDiceResult.setText(messageToShow);
+                }
+            });
+        }
+    } catch (IOException e) {
+        System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+    }*/
+ /*try {
+            String serverMessage;
+            while ((serverMessage = in.readLine()) != null) {
+                System.out.println("Server'dan gelen: " + serverMessage);
+                final String messageToShow = serverMessage;
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    jLabelDiceResult.setText(messageToShow);  // JLabel'a yazıyoruz!
+                });
+            }
+        } catch (IOException e) {
+            System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+        }*/
+
+    }
+
+    /*private void listenForMessages() {
+    try {
+        String serverMessage;
+        while ((serverMessage = in.readLine()) != null) {
+            System.out.println("Server'dan gelen: " + serverMessage);
+            final String messageToShow = serverMessage;  // HATA BURADA ÇÖZÜLÜYOR!
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, messageToShow, "Zar Sonucu", JOptionPane.INFORMATION_MESSAGE);
+            });
+        }
+    } catch (IOException e) {
+        System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+    }
+}*/
+ /*private void listenForMessages() {
+    try {
+        String serverMessage;
+        while ((serverMessage = in.readLine()) != null) {
+            System.out.println("Server'dan gelen: " + serverMessage);
+            // GUI'de göster (örneğin JOptionPane ile veya yeni bir JLabel ile)
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, serverMessage, "Zar Sonucu", JOptionPane.INFORMATION_MESSAGE);
+            });
+        }
+    } catch (IOException e) {
+        System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+    }
+}*/
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabelDiceResult;
+    private javax.swing.JLabel jLabelRollResult;
     private javax.swing.JLabel jLabelWelcome;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables

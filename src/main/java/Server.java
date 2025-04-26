@@ -17,6 +17,7 @@ import java.util.ArrayList;
  * @author tasni
  */
 public class Server {
+     //public static int currentPlayerIndex = 0;  // Şu an hangi oyuncunun sırası
      private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
     public static void main(String[] args) {

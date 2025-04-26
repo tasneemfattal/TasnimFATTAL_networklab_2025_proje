@@ -161,7 +161,7 @@ public class GameClientGUI extends javax.swing.JFrame {
     
     private void openGameScreen() {
     javax.swing.SwingUtilities.invokeLater(() -> {
-        GameScreen gameScreen = new GameScreen(playerName); 
+        GameScreen gameScreen = new GameScreen(playerName , out,in); 
         gameScreen.setVisible(true);
         this.dispose(); 
     });

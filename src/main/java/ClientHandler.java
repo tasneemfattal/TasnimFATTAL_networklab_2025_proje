@@ -16,11 +16,13 @@ import java.util.ArrayList;
  */
 public class ClientHandler extends Thread {
 
-  private Socket clientSocket;
+    private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private String playerName;
     private ArrayList<ClientHandler> clientHandlers;
+
+    public static int currentPlayerIndex = 0;// Şu an hangi oyuncunun sırası
 
     public ClientHandler(Socket socket, ArrayList<ClientHandler> clientHandlers) {
         this.clientSocket = socket;
@@ -38,26 +40,49 @@ public class ClientHandler extends Thread {
                 playerName = message.substring(5);
                 System.out.println("Oyuncu katıldı: " + playerName);
 
-                // ❗ Eğer 2 kişiden fazla bağlanırsa:
                 if (clientHandlers.size() > 2) {
                     out.println("Oyun dolu! Bağlantı kapatılıyor.");
                     clientSocket.close();
-                    return; // Bu client'ı sonlandır
+                    return;
                 } else {
                     out.println("Hoş geldin " + playerName + ", lütfen bekle...");
                 }
 
-                //  İki oyuncu bağlandığında oyun başlasın:
                 if (clientHandlers.size() == 2) {
                     sendMessageToAll("İki oyuncu hazır! Oyun başlıyor!");
+                    // İlk başlayan oyuncuyu bildiriyoruz:
+                    String turnMessage = "SIRA " + clientHandlers.get(currentPlayerIndex).playerName;
+                    sendMessageToAll(turnMessage);
                 }
             }
 
-            //  Oyuncuların diğer mesajlarını burada okuyabilirsin (zar atma vs.)
             while (true) {
                 String input = in.readLine();
-                if (input == null) break; // Client çıkarsa döngüden çıkar
+                if (input == null) {
+                    break;
+                }
+
                 System.out.println(playerName + ": " + input);
+
+                if (input.startsWith("ROLL")) {
+                    int myIndex = clientHandlers.indexOf(this);
+
+                    // SIRA KONTROLÜ
+                    if (myIndex == currentPlayerIndex) {
+                        int diceResult = (int) (Math.random() * 6) + 1;
+                        String rollMessage = "Oyuncu " + playerName + " zar attı: " + diceResult;
+                        sendMessageToAll(rollMessage);
+
+                        // Sıra diğer oyuncuya geçiyor
+                        currentPlayerIndex = (currentPlayerIndex + 1) % clientHandlers.size();
+                        String turnMessage = "SIRA " + clientHandlers.get(currentPlayerIndex).playerName;
+                        sendMessageToAll(turnMessage);
+
+                    } else {
+                        // Sıra beklenmiyorsa:
+                        out.println("Sıra sende değil! Lütfen bekle.");
+                    }
+                }
             }
 
             clientSocket.close();
