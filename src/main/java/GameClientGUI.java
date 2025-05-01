@@ -95,12 +95,25 @@ public class GameClientGUI extends javax.swing.JFrame {
 
             // Server'a oyuncu adını gönderiyoruz
             out.println("JOIN " + playerName);  //
-            new Thread(() -> listenForMessages()).start();
+            //new Thread(() -> listenForMessages()).start();
+            openGameScreen();                   // Dinlemeyi GameScreen yapması için
+            
+            
+            //  
+           /* String response;
+            while ((response = in.readLine()) != null) {
+                if (response.equals("READY")) {
+                    // İki oyuncu bağlandı, oyunu aç!
+                    openGameScreen();
+                    break;
+                } else if (response.equals("WAITING_FOR_PLAYER")) {
+                    statusLabel.setText("Diğer oyuncuyu bekliyorsunuz...");
+                    // Burada döngü devam eder, diğer oyuncu gelene kadar bekler.
+                }
+            }*/
 
-
-            String response = in.readLine(); // Server'dan cevap bekleniyor
-            statusLabel.setText("Server: " + response);
-
+            /* String response = in.readLine(); // Server'dan cevap bekleniyor
+            statusLabel.setText("Server: " + response);*/
         } catch (IOException e) {
             statusLabel.setText("Bağlantı hatası: " + e.getMessage());
         }
@@ -141,9 +154,8 @@ public class GameClientGUI extends javax.swing.JFrame {
             }
         });
     }
-    
-    
-    private void listenForMessages() {
+
+    /* private void listenForMessages() {
     try {
         String serverMessage;
         while ((serverMessage = in.readLine()) != null) {
@@ -156,16 +168,14 @@ public class GameClientGUI extends javax.swing.JFrame {
     } catch (IOException e) {
         System.out.println("Mesaj dinleme hatası: " + e.getMessage());
     }
-}
-
-    
+}*/
     private void openGameScreen() {
-    javax.swing.SwingUtilities.invokeLater(() -> {
-        GameScreen gameScreen = new GameScreen(playerName , out,in); 
-        gameScreen.setVisible(true);
-        this.dispose(); 
-    });
-}
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            GameScreen gameScreen = new GameScreen(playerName, out, in);
+            gameScreen.setVisible(true);
+            this.dispose();
+        });
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
