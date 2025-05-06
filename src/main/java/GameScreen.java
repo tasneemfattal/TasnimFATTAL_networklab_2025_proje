@@ -32,17 +32,15 @@ public class GameScreen extends javax.swing.JFrame {
         this.in = in;
         jLabelWelcome.setText("Oyun başladı, hoş geldin " + playerName + "!");
 
-       
         loadBoardImage();  // board.png güvenli şekilde yüklenir
 
         boardPanel = new GameBoardPanel();
         boardPanel.setOpaque(false);
-        boardPanel.setBounds(0, 0, 590, 570);
-        
-       // boardPanel.generateMatrix();//
+        boardPanel.setBounds(0, 0, 900, 900);
 
+        // boardPanel.generateMatrix();//
         //jPanel1.add(boardPanel);
-        jPanel1.add(boardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 590, 570));
+        jPanel1.add(boardPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 900));
         jPanel1.setComponentZOrder(boardPanel, 0);
 
         // Zar sonucu dinlemeye başla:
@@ -168,22 +166,35 @@ public class GameScreen extends javax.swing.JFrame {
                     if (messageToShow.startsWith("PLAYER_NAMES")) {
                         String[] parts = messageToShow.split(" ");
                         boardPanel.setPlayerNames(parts[1].trim(), parts[2].trim());
+
                     } else if (messageToShow.startsWith("SIRA ")) {
                         String currentTurnPlayer = messageToShow.substring(5);
                         jButton1.setEnabled(currentTurnPlayer.equals(playerName));
                         jLabelDiceResult.setText(currentTurnPlayer.equals(playerName)
                                 ? "Senin sıran! Zar atabilirsin."
                                 : "Şu an " + currentTurnPlayer + " oynuyor, bekle.");
+
                     } else if (messageToShow.startsWith("ROLL_RESULT ")) {
                         String[] parts = messageToShow.split(" ");
                         String gelenOyuncu = parts[1];
                         int zarSonucu = Integer.parseInt(parts[2]);
-                        int yeniPozisyon = Integer.parseInt(parts[3]);
+                        int eskiPozisyon = Integer.parseInt(parts[3]);
+                        int yeniPozisyon = Integer.parseInt(parts[4]);
+
                         jLabelRollResult.setText("Oyuncu " + gelenOyuncu + " zar attı: " + zarSonucu);
                         boardPanel.updatePlayerPosition(gelenOyuncu, yeniPozisyon);
+
+                        // Eğer zar sonucu sonrası pozisyon değişmişse (yılan veya merdiven)
+                        if (eskiPozisyon + zarSonucu != yeniPozisyon) {
+                            jLabelDiceResult.setText(gelenOyuncu + " yılan/merdiven ile "
+                                    + (eskiPozisyon + zarSonucu) + " → " + yeniPozisyon + " gitti!");
+                        }
+
                         checkForWin(gelenOyuncu, yeniPozisyon);
+
                     } else if (messageToShow.equals("RESET")) {
                         restartGame();
+
                     } else {
                         jLabelDiceResult.setText(messageToShow);
                     }
@@ -192,52 +203,6 @@ public class GameScreen extends javax.swing.JFrame {
         } catch (IOException e) {
             System.out.println("Mesaj dinleme hatası: " + e.getMessage());
         }
-
-        /*try {
-            String serverMessage;
-            while ((serverMessage = in.readLine()) != null) {
-                System.out.println("Server'dan gelen: " + serverMessage);
-                final String messageToShow = serverMessage;
-
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    if (messageToShow.startsWith("PLAYER_NAMES")) {
-                        String[] parts = messageToShow.split(" ");
-                        String player1 = parts[1].trim();//trim()boşluklar için
-                        String player2 = parts[2].trim();
-                        System.out.println("Gelen isimler: Player1 = " + player1 + ", Player2 = " + player2);  // Test için ekledim!
-                        boardPanel.setPlayerNames(player1, player2);
-                    } else if (messageToShow.startsWith("SIRA ")) {
-                        String currentTurnPlayer = messageToShow.substring(5);
-                        if (currentTurnPlayer.equals(playerName)) {
-                            jButton1.setEnabled(true);
-                            jLabelDiceResult.setText("Senin sıran! Zar atabilirsin.");
-                        } else {
-                            jButton1.setEnabled(false);
-                            jLabelDiceResult.setText("Şu an " + currentTurnPlayer + " oynuyor, bekle.");
-                        }
-                    } else if (messageToShow.startsWith("ROLL_RESULT ")) {
-                        String[] parts = messageToShow.split(" ");
-                        String gelenOyuncu = parts[1];
-                        int zarSonucu = Integer.parseInt(parts[2]);
-                        int yeniPozisyon = Integer.parseInt(parts[3]);  // ← sunucudan gelen doğru pozisyon
-
-                        jLabelRollResult.setText("Oyuncu " + gelenOyuncu + " zar attı: " + zarSonucu);
-
-                        System.out.println(">>> " + gelenOyuncu + " yeni pozisyon (sunucudan): " + yeniPozisyon);
-                        boardPanel.updatePlayerPosition(gelenOyuncu, yeniPozisyon);  // Taşları güncelle
-                        checkForWin(gelenOyuncu, yeniPozisyon);
-                    } else if (messageToShow.equals("RESET")) {
-                        restartGame();
-                    } else {
-                        jLabelDiceResult.setText(messageToShow);
-                    }
-                });
-            }
-        } catch (IOException e) {
-            System.out.println("Mesaj dinleme hatası: " + e.getMessage());
-        }*/
-
-       
     }
 
     private void checkForWin(String playerName, int position) {

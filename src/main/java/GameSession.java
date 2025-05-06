@@ -1,15 +1,14 @@
+
+import java.util.Map;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 /**
  *
  * @author tasni
  */
-
-
-
 /*İki oyuncuyu eşleştiriyor.
 
 İsimleri ve oyun başlangıcını gönderiyor.
@@ -20,16 +19,41 @@ Sıra yönetimi yapıyor.
 
 Kazanma durumunda yeni oyun başlatabiliyor.*/
 public class GameSession {
-     private ClientHandler player1;
+
+    private ClientHandler player1;
     private ClientHandler player2;
     private int currentPlayerIndex = 0; // 0: player1, 1: player2
     private int[] playerPositions = {0, 0};  // Oyuncuların pozisyonları
+
+    // Merdivenler (başlangıç → çıkış)
+    private static final Map<Integer, Integer> ladders = Map.of(
+            1, 38,
+            4, 18,
+            8, 30,
+            21, 42,
+            28, 76,
+            50, 67,
+            71,92,
+            88, 99
+            
+    );
+
+    //  Yılanlar (başlangıç → kuyruk)
+    private static final Map<Integer, Integer> snakes = Map.of(
+            36, 6,
+            32, 10,
+            62, 18,
+            48, 26,
+            88, 24,
+            95, 56,
+            97, 78
+    );
 
     public GameSession(ClientHandler player1, ClientHandler player2) {
         this.player1 = player1;
         this.player2 = player2;
 
-        // Bu GameSession'u her iki client'a da haber verelim:
+        // Her oyuncuya bu GameSession'u bildir
         player1.setGameSession(this);
         player2.setGameSession(this);
     }
@@ -40,10 +64,10 @@ public class GameSession {
         player1.sendMessage(namesMessage);
         player2.sendMessage(namesMessage);
 
-        // Oyun başladığını söyle
+        // Oyunun başladığını bildir
         sendMessageToBoth("İki oyuncu hazır! Oyun başlıyor!");
 
-        // İlk kimin sırada olduğunu söyle
+        // İlk sıradaki oyuncuyu bildir
         sendTurnInfo();
     }
 
@@ -58,21 +82,36 @@ public class GameSession {
         int diceResult = (int) (Math.random() * 6) + 1;
         int oldPos = playerPositions[playerIndex];
         int newPos = oldPos + diceResult;
+
         if (newPos > 100) {
-            newPos = 100;
+            newPos = oldPos; // Fazla gidemez
         }
+
+        // 🪜 Merdiven kontrolü
+        if (ladders.containsKey(newPos)) {
+            int ladderEnd = ladders.get(newPos);
+            System.out.println("MERDİVEN: " + newPos + " → " + ladderEnd);
+            newPos = ladderEnd;
+        } // 🐍 Yılan kontrolü
+        else if (snakes.containsKey(newPos)) {
+            int snakeTail = snakes.get(newPos);
+            System.out.println("YILAN: " + newPos + " → " + snakeTail);
+            newPos = snakeTail;
+        }
+
         playerPositions[playerIndex] = newPos;
 
-        // Sonucu her iki oyuncuya gönder
-        String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + newPos;
+        /*String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + newPos;
+        sendMessageToBoth(rollMessage);*/
+        // oldPos: zar atılmadan önceki pozisyon
+       //newPos: zar + yılan/merdiven sonrası son pozisyon
+        String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + oldPos + " " + newPos; 
         sendMessageToBoth(rollMessage);
 
-        // Oyuncu kazandı mı kontrol et
         if (newPos == 100) {
             sendMessageToBoth("*** " + roller.getPlayerName() + " kazandı! ***");
-            restartGame();  // İstersen burada yeni oyun başlatabilirsin
+            restartGame();
         } else {
-            // Sıra değiştir
             currentPlayerIndex = (currentPlayerIndex + 1) % 2;
             sendTurnInfo();
         }

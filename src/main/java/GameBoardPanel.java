@@ -94,11 +94,14 @@ public class GameBoardPanel extends JPanel {
         int size = 20;
         int x = p.x - size / 2;
         int y = p.y - size / 2 + yOffset;
+         //int x = p.x+10;
+        //int y = p.y+ yOffset;
 
         g.setColor(color);
         g.fillOval(x, y, size, size);
         g.setColor(Color.BLACK);
         g.drawOval(x, y, size, size);
+        //System.out.println("x:"+x+" y:"+y);
     }
 
     /*private Point[][] generateBoardMatrix(int cellSize, int offsetX, int offsetY) {
