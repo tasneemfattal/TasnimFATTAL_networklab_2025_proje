@@ -28,7 +28,7 @@ public class GameSession {
     // Merdivenler (başlangıç → çıkış)
     private static final Map<Integer, Integer> ladders = Map.of(
             1, 38,
-            4, 18,
+            4, 14,
             8, 30,
             21, 42,
             28, 76,

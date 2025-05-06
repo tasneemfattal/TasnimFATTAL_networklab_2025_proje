@@ -74,37 +74,63 @@ public class GameBoardPanel extends JPanel {
         super.paintComponent(g);
         // Sadece bir kez oluşturulmalı
         if (boardMatrix == null) {
-             //boardMatrix = generateBoardMatrix(55, 20, 20);  // hücre boyutu ve başlangıç offsetleri
-            boardMatrix = BoardUtils.generateBoardMatrix(55, 30, 50);// X, Y, kutu boyutu
+            //boardMatrix = generateBoardMatrix(55, 20, 20);  // hücre boyutu ve başlangıç offsetleri
+            boardMatrix = BoardUtils.generateBoardMatrix(55, 18, 22);// X, Y, kutu boyutu
+            //boardMatrix = BoardUtils.generateBoardMatrix();
         }
 
-        
         // Oyuncu taşlarını çiz
-        drawPlayer(g, player1Position, Color.RED, -8);
+        drawPlayer(g, player1Position, Color.GREEN, -8);
         drawPlayer(g, player2Position, Color.BLUE, +8);
     }
+
+    
     private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
-        if (position <= 0 || position > 100) return;
+    if (position <= 0 || position > 100 || boardMatrix == null) return;
 
-        int index = position - 1;
-        int row = index / 10;
-        int col = index % 10;
+    int index = position - 1;
+    int row = index / 10;
+    int col = index % 10;
 
-        Point p = boardMatrix[row][col];
-        int size = 20;
-        int x = p.x - size / 2;
-        int y = p.y - size / 2 + yOffset;
-         //int x = p.x+10;
-        //int y = p.y+ yOffset;
+    int actualRow = 9 - row;
+    int actualCol = (row % 2 == 0) ? col : 9 - col;
 
-        g.setColor(color);
-        g.fillOval(x, y, size, size);
-        g.setColor(Color.BLACK);
-        g.drawOval(x, y, size, size);
-        //System.out.println("x:"+x+" y:"+y);
+    Point p = boardMatrix[actualRow][actualCol];
+
+    int playerSize = 20;
+    int x = p.x - playerSize / 2;
+    int y = p.y - playerSize / 2 + yOffset;
+
+    g.setColor(color);
+    g.fillOval(x, y, playerSize, playerSize);
+    g.setColor(Color.BLACK);
+    g.drawOval(x, y, playerSize, playerSize);
+}
+
+
+    /*private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
+    if (position <= 0 || position > 100) return;
+
+    int index = position - 1;
+    int row = index / 10;
+    int col = index % 10;
+
+    // Zigzag düzeltmesi (çift satırlar sağdan sola gider)
+    if ((9 - row) % 2 == 1) {  // dikkat: üstten değil alttan sayıyoruz!
+        col = 9 - col;
     }
 
-    /*private Point[][] generateBoardMatrix(int cellSize, int offsetX, int offsetY) {
+    Point p = boardMatrix[9 - row][col];  // Y koordinatı düzeltmesi
+    int size = 20;
+    int x = p.x - size / 2;
+    int y = p.y - size / 2 + yOffset;
+
+    g.setColor(color);
+    g.fillOval(x, y, size, size);
+    g.setColor(Color.BLACK);
+    g.drawOval(x, y, size, size);
+}*/
+ /*private Point[][] generateBoardMatrix(int cellSize, int offsetX, int offsetY) {
         Point[][] matrix = new Point[10][10];
 
         for (int row = 0; row < 10; row++) {
@@ -121,7 +147,7 @@ public class GameBoardPanel extends JPanel {
     }*/
 }
 
-    /*private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
+/*private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
         if (position <= 0 || position > 100 || boardMatrix == null) {
             return;
         }
@@ -144,5 +170,3 @@ public class GameBoardPanel extends JPanel {
         g.drawOval(x, y, playerSize, playerSize);
     }
 }*/
-   
-
