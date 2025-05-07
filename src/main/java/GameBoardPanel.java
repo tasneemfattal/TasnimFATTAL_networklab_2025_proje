@@ -75,7 +75,7 @@ public class GameBoardPanel extends JPanel {
         // Sadece bir kez oluşturulmalı
         if (boardMatrix == null) {
             //boardMatrix = generateBoardMatrix(55, 20, 20);  // hücre boyutu ve başlangıç offsetleri
-            boardMatrix = BoardUtils.generateBoardMatrix(55, 18, 22);// X, Y, kutu boyutu
+            boardMatrix = BoardUtils.generateBoardMatrix(55, 22, 22);// X, Y, kutu boyutu
             //boardMatrix = BoardUtils.generateBoardMatrix();
         }
 
