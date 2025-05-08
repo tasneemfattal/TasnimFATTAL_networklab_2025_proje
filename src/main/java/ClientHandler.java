@@ -98,7 +98,7 @@ public class ClientHandler extends Thread {
                 } else if (input.equals("REPLAY_NO")) {
                     synchronized (ClientHandler.class) {
                         replayVotes++;
-                        if (replayVotes == 2) {
+                        if (replayVotes == 1) {
                             gameSession.sendMessageToBoth("*** Oyun sonlandı. Bir oyuncu tekrar oynamak istemedi. ***");
                             gameSession.sendMessageToBoth("GAME_OVER");
                             replayVotes = 0;
