@@ -184,7 +184,6 @@ public class GameScreen extends javax.swing.JFrame {
                         jLabelRollResult.setText("Oyuncu " + gelenOyuncu + " zar attı: " + zarSonucu);
                         boardPanel.updatePlayerPosition(gelenOyuncu, yeniPozisyon);
 
-                        // Eğer zar sonucu sonrası pozisyon değişmişse (yılan veya merdiven)
                         if (eskiPozisyon + zarSonucu != yeniPozisyon) {
                             jLabelDiceResult.setText(gelenOyuncu + " yılan/merdiven ile "
                                     + (eskiPozisyon + zarSonucu) + " → " + yeniPozisyon + " gitti!");
@@ -194,6 +193,14 @@ public class GameScreen extends javax.swing.JFrame {
 
                     } else if (messageToShow.equals("RESET")) {
                         restartGame();
+
+                    } else if (messageToShow.equals("GAME_OVER")) {
+                        JOptionPane.showMessageDialog(
+                                GameScreen.this,
+                                "Oyun sona erdi. Teşekkürler!",
+                                "Oyun Bitti",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);  // Uygulamayı tamamen kapat
 
                     } else {
                         jLabelDiceResult.setText(messageToShow);
@@ -206,6 +213,30 @@ public class GameScreen extends javax.swing.JFrame {
     }
 
     private void checkForWin(String playerName, int position) {
+        if (position >= 100) {
+            jButton1.setEnabled(false);  // Zar atmayı kapat
+
+            JOptionPane.showMessageDialog(this,
+                    "*** " + playerName + " kazandı! ***",
+                    "Oyun Bitti",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Bu oyuncu tekrar oynamak istiyor mu?
+            int choice = JOptionPane.showConfirmDialog(this,
+                    "Tekrar oynamak ister misiniz?",
+                    "Yeni Oyun?",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (choice == JOptionPane.YES_OPTION) {
+                out.println("REPLAY_YES");
+            } else {
+                out.println("REPLAY_NO");
+            }
+        }
+    }
+
+
+    /*private void checkForWin(String playerName, int position) {
         if (position >= 100) {
             jButton1.setEnabled(false);  // Zar atmayı kapat
             JOptionPane.showMessageDialog(this,
@@ -225,8 +256,7 @@ public class GameScreen extends javax.swing.JFrame {
                 System.exit(0);  // Çıkış
             }
         }
-    }
-
+    }*/
     private void restartGame() {
         // Pozisyonları sıfırla
         boardPanel.updatePlayerPosition(boardPanel.getPlayer1Name(), 0);

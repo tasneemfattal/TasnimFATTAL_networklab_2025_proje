@@ -25,15 +25,18 @@ Zar atınca veya restart isteyince GameSession'a yönlendiriyor.
 
 Her oyuncu kendi GameSession nesnesine bağlı.
 
-*/
+ */
 public class ClientHandler extends Thread {
 
-     private Socket clientSocket;
+    private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private String playerName;
     private ArrayList<ClientHandler> waitingList; // Bekleyen oyuncular listesi
     private GameSession gameSession; // Her client kendi GameSession'ını tutar
+    private boolean wantsReplay = false;
+    private static int replayVotes = 0;
+    private static int replayYesVotes = 0;
 
     public ClientHandler(Socket socket, ArrayList<ClientHandler> waitingList) {
         this.clientSocket = socket;
@@ -41,6 +44,7 @@ public class ClientHandler extends Thread {
     }
 
     @Override
+
     public void run() {
         try {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -66,7 +70,80 @@ public class ClientHandler extends Thread {
 
             while (true) {
                 String input = in.readLine();
-                if (input == null) break;
+                if (input == null) {
+                    break;
+                }
+
+                System.out.println(playerName + ": " + input);
+
+                if (input.startsWith("ROLL")) {
+                    if (gameSession != null) {
+                        gameSession.handleRoll(this);
+                    }
+                } else if (input.equals("REPLAY_YES")) {
+                    wantsReplay = true;
+                    synchronized (ClientHandler.class) {
+                        replayVotes++;
+                        replayYesVotes++;
+                        if (replayVotes == 2) {
+                            if (replayYesVotes == 2) {
+                                gameSession.restartGame();
+                            } else {
+                                gameSession.sendMessageToBoth("Yeni oyun başlatılamadı. Bir oyuncu reddetti.");
+                            }
+                            replayVotes = 0;
+                            replayYesVotes = 0;
+                        }
+                    }
+                } else if (input.equals("REPLAY_NO")) {
+                    synchronized (ClientHandler.class) {
+                        replayVotes++;
+                        if (replayVotes == 2) {
+                            gameSession.sendMessageToBoth("*** Oyun sonlandı. Bir oyuncu tekrar oynamak istemedi. ***");
+                            gameSession.sendMessageToBoth("GAME_OVER");
+                            replayVotes = 0;
+                            replayYesVotes = 0;
+                        }
+                    }
+                }
+            }
+
+            clientSocket.close();
+            System.out.println("Oyuncu bağlantıyı kapattı: " + playerName);
+
+        } catch (IOException e) {
+            System.out.println("Hata (ClientHandler): " + e.getMessage());
+        }
+    }
+
+    /*public void run() {
+        try {
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            String message = in.readLine();
+            if (message != null && message.startsWith("JOIN")) {
+                playerName = message.substring(5);
+                System.out.println("Oyuncu katıldı: " + playerName);
+
+                synchronized (waitingList) {
+                    waitingList.add(this);
+                    if (waitingList.size() >= 2) {
+                        ClientHandler player1 = waitingList.remove(0);
+                        ClientHandler player2 = waitingList.remove(0);
+                        GameSession session = new GameSession(player1, player2);
+                        session.startGame();
+                    } else {
+                        sendMessage("Rakip bekleniyor...");
+                    }
+                }
+            }
+
+            while (true) {
+                String input = in.readLine();
+                if (input == null) {
+                    break;
+                }
 
                 System.out.println(playerName + ": " + input);
 
@@ -87,8 +164,7 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             System.out.println("Hata (ClientHandler): " + e.getMessage());
         }
-    }
-
+    }*/
     public void sendMessage(String message) {
         out.println(message);
     }
@@ -102,7 +178,7 @@ public class ClientHandler extends Thread {
     }
 }
 
-   /* private Socket clientSocket;
+/* private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private String playerName;

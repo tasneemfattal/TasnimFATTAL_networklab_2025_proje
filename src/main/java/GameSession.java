@@ -33,9 +33,8 @@ public class GameSession {
             21, 42,
             28, 76,
             50, 67,
-            71,92,
-            88, 99
-            
+            71, 92,
+            80, 99
     );
 
     //  Yılanlar (başlangıç → kuyruk)
@@ -104,8 +103,8 @@ public class GameSession {
         /*String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + newPos;
         sendMessageToBoth(rollMessage);*/
         // oldPos: zar atılmadan önceki pozisyon
-       //newPos: zar + yılan/merdiven sonrası son pozisyon
-        String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + oldPos + " " + newPos; 
+        //newPos: zar + yılan/merdiven sonrası son pozisyon
+        String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + oldPos + " " + newPos;
         sendMessageToBoth(rollMessage);
 
         if (newPos == 100) {
@@ -116,16 +115,25 @@ public class GameSession {
             sendTurnInfo();
         }
     }
-
+    /* -Her iki oyuncunun tahtadaki yeri temizlenir
+    -Sıra başa döner (player1 başlar)
+    -Her iki client GUI’sine tahtayı sıfırlama komutu gider
+    -GUI’de sadece sırası gelen oyuncunun zar butonu açılır
+    
+    
+    
+    */
     public void restartGame() {
         playerPositions[0] = 0;
         playerPositions[1] = 0;
+        currentPlayerIndex = 0;
+        // İlk oyuncu başlasın
         currentPlayerIndex = 0;
         sendMessageToBoth("RESET");
         sendTurnInfo();
     }
 
-    private void sendMessageToBoth(String message) {
+    void sendMessageToBoth(String message) {
         player1.sendMessage(message);
         player2.sendMessage(message);
     }
@@ -134,4 +142,6 @@ public class GameSession {
         String currentPlayerName = (currentPlayerIndex == 0) ? player1.getPlayerName() : player2.getPlayerName();
         sendMessageToBoth("SIRA " + currentPlayerName);
     }
+    
+    
 }
