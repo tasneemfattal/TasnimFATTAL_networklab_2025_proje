@@ -14,6 +14,20 @@ import javax.swing.JOptionPane;
  *
  * @author tasni
  */
+
+/*
+*GameScreen sınıfı, bir oyuncunun oyuna bağlandıktan sonra gördüğü asıl oyun ekranıdır. Burada:
+
+-Oyunun görsel tahtası (board.png) gösterilir.
+
+-Oyuncular zar atabilir.
+
+-Kimin sırası olduğu, zar sonucu ve pozisyon değişimleri gösterilir.
+
+-Kazanan tespit edilince kullanıcıya bildirilir ve tekrar oynamak isteyip istemediği sorulur.
+
+-Tahta üzerindeki piyonlar (taşlar) doğru pozisyonlara çizilir.
+*/
 public class GameScreen extends javax.swing.JFrame {
 
     private PrintWriter out;
@@ -62,15 +76,7 @@ public class GameScreen extends javax.swing.JFrame {
         ImageIcon icon = new ImageIcon(imgURL);
         lbl_image.setIcon(icon);
 
-        // Yeni boyutu belirle (daha küçük örnek)
-        /*int width = 400;
-        int height = 400;
-
-        Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        lbl_image.setIcon(new ImageIcon(scaledImage));
-        lbl_image.setBounds(0, 0, width, height); // önemli!
-        lbl_image.revalidate();
-        lbl_image.repaint();*/
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -106,10 +112,10 @@ public class GameScreen extends javax.swing.JFrame {
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 630, -1, -1));
 
         jLabelDiceResult.setText("sıra ...");
-        getContentPane().add(jLabelDiceResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 620, 170, 30));
+        getContentPane().add(jLabelDiceResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 620, 250, 30));
 
         jLabelRollResult.setText("Zar sonucu.....");
-        getContentPane().add(jLabelRollResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 640, 150, 30));
+        getContentPane().add(jLabelRollResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 640, 250, 30));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -236,27 +242,7 @@ public class GameScreen extends javax.swing.JFrame {
     }
 
 
-    /*private void checkForWin(String playerName, int position) {
-        if (position >= 100) {
-            jButton1.setEnabled(false);  // Zar atmayı kapat
-            JOptionPane.showMessageDialog(this,
-                    "*** " + playerName + " kazandi! ***",
-                    "Oyun Bitti",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            // Tekrar oyna mı çık mı sor
-            int choice = JOptionPane.showConfirmDialog(this,
-                    "Tekrar oynamak ister misiniz?",
-                    "Yeni Oyun?",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (choice == JOptionPane.YES_OPTION) {
-                restartGame();  // Yeni oyun başlat
-            } else {
-                System.exit(0);  // Çıkış
-            }
-        }
-    }*/
+    
     private void restartGame() {
         // Pozisyonları sıfırla
         boardPanel.updatePlayerPosition(boardPanel.getPlayer1Name(), 0);

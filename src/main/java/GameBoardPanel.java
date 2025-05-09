@@ -15,44 +15,45 @@ import javax.swing.JPanel;
  *
  * @author tasni
  */
+
+
+/**
+ * Bu sınıf, oyun tahtasını çizen özel bir JPanel'dir.
+ * Oyuncu taşlarını pozisyonlarına göre yerleştirir.
+ * Her kare için (1-100) grafiksel koordinatlar hesaplanır.
+ */
 public class GameBoardPanel extends JPanel {
 
-    // private int rows = 10;  // 10 satır
-    //private int cols = 10;  // 10 sütun (100 kare)
-    private int player1Position = 0;  // 0 = henüz tahtada değil
+    // Oyuncuların tahtadaki pozisyonları
+    private int player1Position = 0;  // 0 → henüz oyuna başlamadı
     private int player2Position = 0;
 
-    private String player1Name = "";  // Dinamik oyuncu 1 ismi
-    private String player2Name = "";  // Dinamik oyuncu 2 ismi
+    // Oyuncu adları GUI'den dinamik olarak alınır
+    private String player1Name = "";
+    private String player2Name = "";
 
-    //private Point[] cellCoordinates;
-    private Point[][] boardMatrix;  // 10x10 tahta koordinatları
+    // 10x10 tahta üzerindeki her kutunun merkez koordinatı
+    private Point[][] boardMatrix;
 
+    /**
+     * Oyuncu isimlerini belirleyen metot
+     */
     public void setPlayerNames(String name1, String name2) {
         this.player1Name = name1;
         this.player2Name = name2;
         System.out.println("setPlayerNames çağrıldı → Player1: [" + player1Name + "], Player2: [" + player2Name + "]");
-        repaint();
+        repaint();  // yeniden çiz
     }
 
-    // Getter'lar (isimleri almak için):
-    public String getPlayer1Name() {
-        return player1Name;
-    }
+    // Getter'lar (isim ve pozisyon almak için)
+    public String getPlayer1Name() { return player1Name; }
+    public String getPlayer2Name() { return player2Name; }
+    public int getPlayer1Position() { return player1Position; }
+    public int getPlayer2Position() { return player2Position; }
 
-    public String getPlayer2Name() {
-        return player2Name;
-    }
-
-    public int getPlayer1Position() {
-        return player1Position;
-    }
-
-    public int getPlayer2Position() {
-        return player2Position;
-    }
-
-    //  Oyuncuların pozisyonunu güncelle:
+    /**
+     * Oyuncu taşlarının pozisyonunu günceller
+     */
     public void updatePlayerPosition(String playerName, int newPosition) {
         System.out.println("Gelen isim: [" + playerName + "]");
         System.out.println("Player1 name: [" + player1Name + "]");
@@ -65,108 +66,56 @@ public class GameBoardPanel extends JPanel {
         } else {
             System.out.println("? No matching player found for: " + playerName);
         }
-        repaint();
+
+        repaint();  // yeniden çizdir
     }
 
-    //  Tahta çizimi:
+    /**
+     * Tahta çizimi ve oyuncu taşlarının ekranda gösterimi
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Sadece bir kez oluşturulmalı
+
+        // İlk kez çiziliyorsa matrix'i oluştur
         if (boardMatrix == null) {
-            //boardMatrix = generateBoardMatrix(55, 20, 20);  // hücre boyutu ve başlangıç offsetleri
-            boardMatrix = BoardUtils.generateBoardMatrix(55, 24, 22);// X, Y, kutu boyutu
-            //boardMatrix = BoardUtils.generateBoardMatrix();
+            boardMatrix = BoardUtils.generateBoardMatrix(55, 24, 22);  // kutu boyutu ve konum offsetleri
         }
 
         // Oyuncu taşlarını çiz
-        drawPlayer(g, player1Position, Color.GREEN, -8);
-        drawPlayer(g, player2Position, Color.BLUE, +8);
+        drawPlayer(g, player1Position, Color.GREEN, -8);  // oyuncu 1 hafif yukarıda
+        drawPlayer(g, player2Position, Color.BLUE, +6);   // oyuncu 2 hafif aşağıda
     }
 
-    
+    /**
+     * Verilen pozisyondaki taşın tahtada çizimini yapar
+     *
+     * @param g         Graphics nesnesi
+     * @param position  1–100 arası pozisyon
+     * @param color     Taşın rengi
+     * @param yOffset   Taşların üst üste binmesini önlemek için dikey ofset
+     */
     private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
-    if (position <= 0 || position > 100 || boardMatrix == null) return;
+        if (position <= 0 || position > 100 || boardMatrix == null) return;
 
-    int index = position - 1;
-    int row = index / 10;
-    int col = index % 10;
-
-    int actualRow = 9 - row;
-    int actualCol = (row % 2 == 0) ? col : 9 - col;
-
-    Point p = boardMatrix[actualRow][actualCol];
-
-    int playerSize = 20;
-    int x = p.x - playerSize / 2;
-    int y = p.y - playerSize / 2 + yOffset;
-
-    g.setColor(color);
-    g.fillOval(x, y, playerSize, playerSize);
-    g.setColor(Color.BLACK);
-    g.drawOval(x, y, playerSize, playerSize);
-}
-
-
-    /*private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
-    if (position <= 0 || position > 100) return;
-
-    int index = position - 1;
-    int row = index / 10;
-    int col = index % 10;
-
-    // Zigzag düzeltmesi (çift satırlar sağdan sola gider)
-    if ((9 - row) % 2 == 1) {  // dikkat: üstten değil alttan sayıyoruz!
-        col = 9 - col;
-    }
-
-    Point p = boardMatrix[9 - row][col];  // Y koordinatı düzeltmesi
-    int size = 20;
-    int x = p.x - size / 2;
-    int y = p.y - size / 2 + yOffset;
-
-    g.setColor(color);
-    g.fillOval(x, y, size, size);
-    g.setColor(Color.BLACK);
-    g.drawOval(x, y, size, size);
-}*/
- /*private Point[][] generateBoardMatrix(int cellSize, int offsetX, int offsetY) {
-        Point[][] matrix = new Point[10][10];
-
-        for (int row = 0; row < 10; row++) {
-            boolean leftToRight = (row % 2 == 0);
-            for (int col = 0; col < 10; col++) {
-                int x = leftToRight ? offsetX + col * cellSize
-                                    : offsetX + (9 - col) * cellSize;
-                int y = offsetY + (9 - row) * cellSize;
-                matrix[row][col] = new Point(x, y);
-            }
-        }
-
-        return matrix;
-    }*/
-}
-
-/*private void drawPlayer(Graphics g, int position, Color color, int yOffset) {
-        if (position <= 0 || position > 100 || boardMatrix == null) {
-            return;
-        }
-
+        // Pozisyona göre satır/sütun hesapla (zigzag mantığı)
         int index = position - 1;
         int row = index / 10;
         int col = index % 10;
-        if ((9 - row) % 2 == 1) { // satır sağdan sola gidiyorsa
-            col = 9 - col;
-        }
 
-        Point p = boardMatrix[9 - row][col]; // Yukarıdan aşağıya indeks düzelt
-        int playerSize = 20;
+        int actualRow = 9 - row;
+        int actualCol = (row % 2 == 0) ? col : 9 - col;
+
+        Point p = boardMatrix[actualRow][actualCol];
+
+        int playerSize = 20;  // taş boyutu
         int x = p.x - playerSize / 2;
         int y = p.y - playerSize / 2 + yOffset;
 
+        // Taşı çiz
         g.setColor(color);
         g.fillOval(x, y, playerSize, playerSize);
         g.setColor(Color.BLACK);
         g.drawOval(x, y, playerSize, playerSize);
     }
-}*/
+}

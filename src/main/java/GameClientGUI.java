@@ -14,16 +14,25 @@ import javax.swing.JOptionPane;
  *
  * @author tasni
  */
-public class GameClientGUI extends javax.swing.JFrame {
 
+/**
+ * Bu sınıf, oyuncunun adını girdiği ve oyuna başlamak için butona bastığı ilk GUI'dir.
+ * Oyuncu ismini alır, sunucuya bağlanır ve ismi gönderir.
+ * Bağlantı başarılıysa oyun ekranını (`GameScreen`) açar.
+ */
+public class GameClientGUI extends javax.swing.JFrame {
+ // Ağ bağlantısı için gerekli değişkenler
+    
+    // Oyuncunun sunucuya bağlanmasını sağlayan soket (ağ bağlantısını temsil eder)
     private Socket socket;
+    // Sunucuya mesaj göndermek için kullanılır (örneğin: "JOIN", "ROLL", "REPLAY_YES")
     private PrintWriter out;
+    // Sunucudan gelen mesajları okumak için kullanılır (örneğin: "ROLL_RESULT", "SIRA")
     private BufferedReader in;
+    // Oyuncu ismi
     private String playerName;
 
-    /**
-     * Creates new form GameClientGUI
-     */
+    
     public GameClientGUI() {
         initComponents();
     }
@@ -78,8 +87,8 @@ public class GameClientGUI extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         // TODO add your handling code here:
-        //String playerName = playerNameField.getText();
-        playerName = playerNameField.getText(); //Yani playerName değişkenini class seviyesinde tanımlamak
+        
+        playerName = playerNameField.getText(); // TextField'dan oyuncu ismi al
 
         if (!playerName.isEmpty()) {
             statusLabel.setText("Oyuncu: " + playerName + " - Hazır!");
@@ -95,25 +104,8 @@ public class GameClientGUI extends javax.swing.JFrame {
 
             // Server'a oyuncu adını gönderiyoruz
             out.println("JOIN " + playerName);  //
-            //new Thread(() -> listenForMessages()).start();
             openGameScreen();                   // Dinlemeyi GameScreen yapması için
             
-            
-            //  
-           /* String response;
-            while ((response = in.readLine()) != null) {
-                if (response.equals("READY")) {
-                    // İki oyuncu bağlandı, oyunu aç!
-                    openGameScreen();
-                    break;
-                } else if (response.equals("WAITING_FOR_PLAYER")) {
-                    statusLabel.setText("Diğer oyuncuyu bekliyorsunuz...");
-                    // Burada döngü devam eder, diğer oyuncu gelene kadar bekler.
-                }
-            }*/
-
-            /* String response = in.readLine(); // Server'dan cevap bekleniyor
-            statusLabel.setText("Server: " + response);*/
         } catch (IOException e) {
             statusLabel.setText("Bağlantı hatası: " + e.getMessage());
         }
@@ -155,20 +147,9 @@ public class GameClientGUI extends javax.swing.JFrame {
         });
     }
 
-    /* private void listenForMessages() {
-    try {
-        String serverMessage;
-        while ((serverMessage = in.readLine()) != null) {
-            System.out.println("Server'dan gelen: " + serverMessage);
-            if (serverMessage.equals("İki oyuncu hazır! Oyun başlıyor!")) {
-                openGameScreen();
-                break;
-            }
-        }
-    } catch (IOException e) {
-        System.out.println("Mesaj dinleme hatası: " + e.getMessage());
-    }
-}*/
+    /**
+     * Oyun ekranını (GameScreen) açar ve bu pencereyi kapatır
+     */
     private void openGameScreen() {
         javax.swing.SwingUtilities.invokeLater(() -> {
             GameScreen gameScreen = new GameScreen(playerName, out, in);

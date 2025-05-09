@@ -15,21 +15,40 @@ import java.util.ArrayList;
  *
  * @author tasni
  */
+/**
+ * Bu sınıf oyun sunucusunu başlatır.
+ * Oyuncular bağlandıkça onları ClientHandler nesnesiyle eşleştirir.
+ * Her client için ayrı bir iş parçacığı (thread) oluşturur.
+ */
+
+/*
+*Bu sınıf oyunun sunucu tarafını yönetir.
+
+*Oyuncular Socket ile bağlandıkça onları bir listeye alır (waitingPlayers).
+
+*İki oyuncu hazır olduğunda, ClientHandler sınıfı bu oyuncuları eşleştirip oyunu başlatır.
+
+*Sunucunun kendisi grafik arayüz içermez, sadece konsoldan çalışır ve istemcilerle ağ iletişimi kurar.
+*/
 public class Server {
-  private static ArrayList<ClientHandler> waitingPlayers = new ArrayList<>(); // Bekleyen oyuncular
+
+    // Bağlantı bekleyen oyuncular listesi
+    private static ArrayList<ClientHandler> waitingPlayers = new ArrayList<>();
 
     public static void main(String[] args) {
-        int port = 1234;
+        int port = 1234;  // Sunucunun dinleyeceği port numarası
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server çalışıyor, oyuncular bekleniyor...");
 
+            // Sonsuz döngü: Yeni oyuncular bağlandıkça işle
             while (true) {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept(); // Yeni bağlantı kabul edilir
                 System.out.println("Yeni bir oyuncu bağlandı!");
 
+                // Her oyuncu için ayrı bir ClientHandler oluştur ve başlat
                 ClientHandler clientHandler = new ClientHandler(clientSocket, waitingPlayers);
-                clientHandler.start();
+                clientHandler.start(); // Thread başlatılır
             }
 
         } catch (IOException e) {
@@ -37,91 +56,4 @@ public class Server {
         }
     }
 }
-   /* private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-
-    public static void main(String[] args) {
-        int port = 1234;
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server calısıyor, oyuncular bekleniyor...");
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-
-                if (clientHandlers.size() >= 2) {
-                    System.out.println("Baglanmaya calısan fazla bir oyuncu var, bağlantı reddedildi.");
-                    PrintWriter tempOut = new PrintWriter(clientSocket.getOutputStream(), true);
-                    tempOut.println("Oyun dolu! Bağlantı kapatılıyor.");
-                    clientSocket.close();
-                    continue;
-                }
-
-                System.out.println("Yeni bir oyuncu bağlandı!");
-                ClientHandler clientHandler = new ClientHandler(clientSocket, clientHandlers);
-                clientHandlers.add(clientHandler);
-                clientHandler.start();
-            }
-
-        } catch (IOException e) {
-            System.out.println("Server hatası: " + e.getMessage());
-        }
-    }
-
-    // Tüm clientlara mesaj gönder
-    public static void sendMessageToAll(String message) {
-        for (ClientHandler client : clientHandlers) {
-            client.sendMessage(message);
-        }
-    }
-
-    // Oyuncu isimlerini iki kişi bağlanınca gönder
-    public static void sendPlayerNames() {
-        if (clientHandlers.size() == 2) {  // İki oyuncu varsa isimleri yolla
-            String player1Name = clientHandlers.get(0).getPlayerName().trim();
-            String player2Name = clientHandlers.get(1).getPlayerName().trim();
-            String namesMessage = "PLAYER_NAMES " + player1Name + " " + player2Name;
-
-            System.out.println("GÖNDERİLEN Player1: [" + player1Name + "]");
-            System.out.println("GÖNDERİLEN Player2: [" + player2Name + "]");
-
-            for (ClientHandler handler : clientHandlers) {
-                handler.sendMessage(namesMessage);
-            }
-
-            sendMessageToAll("İki oyuncu hazır! Oyun başlıyor!");
-            String turnMessage = "SIRA " + clientHandlers.get(ClientHandler.currentPlayerIndex).getPlayerName();
-            sendMessageToAll(turnMessage);
-        }
-    }
-}*/
-
-/* private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-
-    public static void main(String[] args) {
-        int port = 1234;
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server çalışıyor, oyuncular bekleniyor...");
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-
-                // ÖNCE KONTROL EDECEĞİZ (EKLEMEDEN ÖNCE!)
-                if (clientHandlers.size() >= 2) {
-                    System.out.println("Bağlanmaya çalışan fazla bir oyuncu var, bağlantı reddedildi.");
-                    PrintWriter tempOut = new PrintWriter(clientSocket.getOutputStream(), true);
-                    tempOut.println("Oyun dolu! Bağlantı kapatılıyor.");
-                    clientSocket.close();
-                    continue; // Bu oyuncuyu kabul etme, sıradakine geç
-                }
-
-                System.out.println("Yeni bir oyuncu bağlandı!");
-                ClientHandler clientHandler = new ClientHandler(clientSocket, clientHandlers);
-                clientHandlers.add(clientHandler);
-                clientHandler.start();
-            }
-
-        } catch (IOException e) {
-            System.out.println("Server hatası: " + e.getMessage());
-        }
-    }*/
+   

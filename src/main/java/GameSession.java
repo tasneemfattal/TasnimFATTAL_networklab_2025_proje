@@ -17,6 +17,8 @@ Zar atıldığında sonucu işliyor ve güncelliyor.
 
 Sıra yönetimi yapıyor.
 
+yılanlar ve merdivenlere kontrol ediyor
+
 Kazanma durumunda yeni oyun başlatabiliyor.*/
 public class GameSession {
 
@@ -39,10 +41,10 @@ public class GameSession {
 
     //  Yılanlar (başlangıç → kuyruk)
     private static final Map<Integer, Integer> snakes = Map.of(
-            36, 6,
             32, 10,
-            62, 18,
+            36, 6,
             48, 26,
+            62, 18,
             88, 24,
             95, 56,
             97, 78
@@ -115,14 +117,12 @@ public class GameSession {
             sendTurnInfo();
         }
     }
+
     /* -Her iki oyuncunun tahtadaki yeri temizlenir
     -Sıra başa döner (player1 başlar)
     -Her iki client GUI’sine tahtayı sıfırlama komutu gider
     -GUI’de sadece sırası gelen oyuncunun zar butonu açılır
-    
-    
-    
-    */
+     */
     public void restartGame() {
         playerPositions[0] = 0;
         playerPositions[1] = 0;
@@ -142,6 +142,5 @@ public class GameSession {
         String currentPlayerName = (currentPlayerIndex == 0) ? player1.getPlayerName() : player2.getPlayerName();
         sendMessageToBoth("SIRA " + currentPlayerName);
     }
-    
-    
+
 }
