@@ -84,7 +84,7 @@ public class GameBoardPanel extends JPanel {
 
         // Oyuncu taşlarını çiz
         drawPlayer(g, player1Position, Color.GREEN, -8);  // oyuncu 1 hafif yukarıda
-        drawPlayer(g, player2Position, Color.BLUE, +6);   // oyuncu 2 hafif aşağıda
+        drawPlayer(g, player2Position, Color.BLUE, +2);   // oyuncu 2 hafif aşağıda
     }
 
     /**

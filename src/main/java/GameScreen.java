@@ -96,7 +96,7 @@ public class GameScreen extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbl_image.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/board.png"))); // NOI18N
-        jPanel1.add(lbl_image, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 590, 570));
+        jPanel1.add(lbl_image, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 590, 570));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, -1, 570));
 
