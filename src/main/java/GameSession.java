@@ -27,6 +27,8 @@ public class GameSession {
     private int currentPlayerIndex = 0; // 0: player1, 1: player2
     private int[] playerPositions = {0, 0};  // Oyuncuların pozisyonları
 
+    private boolean isReplayConfirmed = true;  // ilk oyun başladığında true, tekrar oyunlarda kontrol ederiz
+
     // Merdivenler (başlangıç → çıkış)
     private static final Map<Integer, Integer> ladders = Map.of(
             1, 38,
@@ -66,13 +68,18 @@ public class GameSession {
         player2.sendMessage(namesMessage);
 
         // Oyunun başladığını bildir
-        sendMessageToBoth("İki oyuncu hazır! Oyun başlıyor!");
+        sendMessageToBoth("iki oyuncu hazir! Oyun basliyor!");
 
         // İlk sıradaki oyuncuyu bildir
         sendTurnInfo();
     }
 
     public void handleRoll(ClientHandler roller) {
+        if (!isReplayConfirmed) {
+            roller.sendMessage("Diğer oyuncu tekrar oynamayı onaylamadı. Lütfen bekleyin...");
+            return;
+        }
+
         int playerIndex = (roller == player1) ? 0 : 1;
 
         if (playerIndex != currentPlayerIndex) {
@@ -123,12 +130,21 @@ public class GameSession {
     -Her iki client GUI’sine tahtayı sıfırlama komutu gider
     -GUI’de sadece sırası gelen oyuncunun zar butonu açılır
      */
-    public void restartGame() {
+ /*public void restartGame() {
         playerPositions[0] = 0;
         playerPositions[1] = 0;
         currentPlayerIndex = 0;
         // İlk oyuncu başlasın
         currentPlayerIndex = 0;
+        sendMessageToBoth("RESET");
+        sendTurnInfo();
+    }*/
+    public void restartGame() {
+        playerPositions[0] = 0;
+        playerPositions[1] = 0;
+        currentPlayerIndex = 0;
+        isReplayConfirmed = true; // Yeni oyun başlamaya hazır demektir
+
         sendMessageToBoth("RESET");
         sendTurnInfo();
     }
@@ -141,6 +157,14 @@ public class GameSession {
     private void sendTurnInfo() {
         String currentPlayerName = (currentPlayerIndex == 0) ? player1.getPlayerName() : player2.getPlayerName();
         sendMessageToBoth("SIRA " + currentPlayerName);
+    }
+
+    public boolean isReplayConfirmed() {
+        return isReplayConfirmed;
+    }
+
+    public void setReplayConfirmed(boolean confirmed) {
+        this.isReplayConfirmed = confirmed;
     }
 
 }

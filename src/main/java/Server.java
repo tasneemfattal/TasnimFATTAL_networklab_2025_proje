@@ -39,12 +39,12 @@ public class Server {
         int port = 1234;  // Sunucunun dinleyeceği port numarası
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server çalışıyor, oyuncular bekleniyor...");
+            System.out.println("Server calisiyor, oyuncular bekleniyor...");
 
             // Sonsuz döngü: Yeni oyuncular bağlandıkça işle
             while (true) {
                 Socket clientSocket = serverSocket.accept(); // Yeni bağlantı kabul edilir
-                System.out.println("Yeni bir oyuncu bağlandı!");
+                System.out.println("Yeni bir oyuncu baglandi!");
 
                 // Her oyuncu için ayrı bir ClientHandler oluştur ve başlat
                 ClientHandler clientHandler = new ClientHandler(clientSocket, waitingPlayers);
@@ -52,7 +52,7 @@ public class Server {
             }
 
         } catch (IOException e) {
-            System.out.println("Server hatası: " + e.getMessage());
+            System.out.println("Server hatasi: " + e.getMessage());
         }
     }
 }

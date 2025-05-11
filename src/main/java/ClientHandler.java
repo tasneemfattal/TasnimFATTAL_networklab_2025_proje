@@ -27,12 +27,11 @@ Her oyuncu kendi GameSession nesnesine bağlı.
 
  */
 /**
- * Her bağlanan oyuncu için bir thread (iş parçacığı) başlatır.
- * Oyuncuların gönderdiği mesajlara göre:
- *   - Oyuncuyu oyun eşleştirme listesine ekler,
- *   - Zar atma, tekrar oynama gibi talepleri işler,
- *   - GameSession sınıfıyla iletişim kurarak oyunun mantığını sürdürür.
- * Oyunculardan biri tekrar oynamayı reddederse, diğer oyuncuya haber verip oyunu kapatır.
+ * Her bağlanan oyuncu için bir thread (iş parçacığı) başlatır. Oyuncuların
+ * gönderdiği mesajlara göre: - Oyuncuyu oyun eşleştirme listesine ekler, - Zar
+ * atma, tekrar oynama gibi talepleri işler, - GameSession sınıfıyla iletişim
+ * kurarak oyunun mantığını sürdürür. Oyunculardan biri tekrar oynamayı
+ * reddederse, diğer oyuncuya haber verip oyunu kapatır.
  */
 public class ClientHandler extends Thread {
 
@@ -44,7 +43,7 @@ public class ClientHandler extends Thread {
     private ArrayList<ClientHandler> waitingList; // Oyuncu eşleşmesini bekleyenler listesi
     private GameSession gameSession; // Bu oyuncunun dahil olduğu oyun oturumu
 
-    private boolean wantsReplay = false; // Oyuncu tekrar oynamak istiyor mu?
+   // private boolean  = false; // Oyuncu tekrar oynamak istiyor mu?
     private static int replayVotes = 0;     // Toplam tekrar isteği cevap sayısı
     private static int replayYesVotes = 0;  // Evet diyen oyuncu sayısı
 
@@ -64,7 +63,7 @@ public class ClientHandler extends Thread {
             String message = in.readLine();
             if (message != null && message.startsWith("JOIN")) {
                 playerName = message.substring(5);
-                System.out.println("Oyuncu katıldı: " + playerName);
+                System.out.println("Oyuncu katildi: " + playerName);
 
                 // Oyuncu eşleştirme işlemi yapılır
                 synchronized (waitingList) {
@@ -96,7 +95,7 @@ public class ClientHandler extends Thread {
                     }
 
                 } else if (input.equals("REPLAY_YES")) {
-                    wantsReplay = true;
+                    //wantsReplay = true;
                     synchronized (ClientHandler.class) {
                         replayVotes++;
                         replayYesVotes++;
@@ -104,6 +103,7 @@ public class ClientHandler extends Thread {
                         // Her iki oyuncu da tekrar oynamak istediyse
                         if (replayVotes == 2) {
                             if (replayYesVotes == 2) {
+                                gameSession.setReplayConfirmed(true);   //  İkisi de EVET dediyse oyun başlasın
                                 gameSession.restartGame(); // Oyunu baştan başlat
                             } else {
                                 gameSession.sendMessageToBoth("Yeni oyun başlatılamadı. Bir oyuncu reddetti.");
@@ -112,20 +112,24 @@ public class ClientHandler extends Thread {
                             // Sayaçları sıfırla
                             replayVotes = 0;
                             replayYesVotes = 0;
+                        } else {
+                            gameSession.setReplayConfirmed(false); //  Daha sadece 1 kişi evet dedi
                         }
                     }
 
-                } else if (input.equals("REPLAY_NO")) {
+                }  else if(input.equals("REPLAY_NO")) {
                     synchronized (ClientHandler.class) {
-                        replayVotes++;
+                        //replayVotes++;
 
                         // Bir oyuncu tekrar oynamak istemiyorsa hemen oyunu sonlandır
-                        if (replayVotes == 1) {
-                            gameSession.sendMessageToBoth("*** Oyun sonlandı. Bir oyuncu tekrar oynamak istemedi. ***");
+                       // if (replayVotes == 1) {
+                            gameSession.sendMessageToBoth("*** Oyun sonlandı. " + playerName + " tekrar oynamak istemedi. ***");
                             gameSession.sendMessageToBoth("GAME_OVER");
+                           
+
                             replayVotes = 0;
                             replayYesVotes = 0;
-                        }
+                        //}
                     }
                 }
             }
@@ -142,10 +146,10 @@ public class ClientHandler extends Thread {
             try {
                 clientSocket.close();
             } catch (IOException ex) {
-                System.out.println("Socket kapatma hatası: " + ex.getMessage());
+                System.out.println("Socket kapatma hatasi: " + ex.getMessage());
             }
 
-            System.out.println("Oyuncu bağlantıyı kapattı: " + playerName);
+            System.out.println("Oyuncu baglantiyi kapatti: " + playerName);
         }
     }
 

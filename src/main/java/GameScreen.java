@@ -112,10 +112,10 @@ public class GameScreen extends javax.swing.JFrame {
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 630, -1, -1));
 
         jLabelDiceResult.setText("sıra ...");
-        getContentPane().add(jLabelDiceResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 620, 250, 30));
+        getContentPane().add(jLabelDiceResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 620, 300, 30));
 
         jLabelRollResult.setText("Zar sonucu.....");
-        getContentPane().add(jLabelRollResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 640, 250, 30));
+        getContentPane().add(jLabelRollResult, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 640, 250, 30));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -214,7 +214,7 @@ public class GameScreen extends javax.swing.JFrame {
                 });
             }
         } catch (IOException e) {
-            System.out.println("Mesaj dinleme hatası: " + e.getMessage());
+            System.out.println("Mesaj dinleme hatasi: " + e.getMessage());
         }
     }
 

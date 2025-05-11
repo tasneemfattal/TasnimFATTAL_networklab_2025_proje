@@ -83,7 +83,7 @@ public class GameClientGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -99,14 +99,14 @@ public class GameClientGUI extends javax.swing.JFrame {
         playerName = playerNameField.getText(); // TextField'dan oyuncu ismi al
 
         if (!playerName.isEmpty()) {
-            statusLabel.setText("Oyuncu: " + playerName + " - Hazır!");
+            statusLabel.setText("Oyuncu: " + playerName + " - Hazir!");
         } else {
             JOptionPane.showMessageDialog(this, "Lütfen adınızı giriniz!", "Uyarı", JOptionPane.WARNING_MESSAGE);
             return; // Eğer isim yoksa devam etmesin!
         }
 
         try {
-            socket = new Socket("localhost", 1234); // AWS yerine şimdilik localhost
+            socket = new Socket("51.20.114.255", 1234); // AWS yerine şimdilik localhost
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -115,7 +115,7 @@ public class GameClientGUI extends javax.swing.JFrame {
             openGameScreen();                   // Dinlemeyi GameScreen yapması için
             
         } catch (IOException e) {
-            statusLabel.setText("Bağlantı hatası: " + e.getMessage());
+            statusLabel.setText("Baglantı hatasi: " + e.getMessage());
         }
 
     }//GEN-LAST:event_startButtonActionPerformed

@@ -64,7 +64,7 @@ public class GameBoardPanel extends JPanel {
         } else if (playerName.equalsIgnoreCase(player2Name)) {
             player2Position = newPosition;
         } else {
-            System.out.println("? No matching player found for: " + playerName);
+            System.out.println("? Sunun icin eslesen oyuncu bulunamadi: " + playerName);
         }
 
         repaint();  // yeniden çizdir
