@@ -1,3 +1,5 @@
+package snakesandladders;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -106,7 +108,7 @@ public class GameClientGUI extends javax.swing.JFrame {
         }
 
         try {
-            socket = new Socket("51.20.114.255", 1234); // AWS yerine şimdilik localhost
+            socket = new Socket("localhost", 1234); // AWS yerine şimdilik localhost ("16.171.162.245")
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

@@ -1,3 +1,4 @@
+package snakesandladders;
 
 import java.util.Map;
 
@@ -98,25 +99,24 @@ public class GameSession {
         // 🪜 Merdiven kontrolü
         if (ladders.containsKey(newPos)) {
             int ladderEnd = ladders.get(newPos);
-            System.out.println("MERDİVEN: " + newPos + " → " + ladderEnd);
+            System.out.println("MERDIVEN: " + newPos + " -> " + ladderEnd);
             newPos = ladderEnd;
         } // 🐍 Yılan kontrolü
         else if (snakes.containsKey(newPos)) {
             int snakeTail = snakes.get(newPos);
-            System.out.println("YILAN: " + newPos + " → " + snakeTail);
+            System.out.println("YILAN: " + newPos + " -> " + snakeTail);
             newPos = snakeTail;
         }
 
         playerPositions[playerIndex] = newPos;
-
-        /*String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + newPos;
-        sendMessageToBoth(rollMessage);*/
-        // oldPos: zar atılmadan önceki pozisyon
-        //newPos: zar + yılan/merdiven sonrası son pozisyon
         String rollMessage = "ROLL_RESULT " + roller.getPlayerName() + " " + diceResult + " " + oldPos + " " + newPos;
         sendMessageToBoth(rollMessage);
+        // Sunucu konsoluna log yaz
+        System.out.println(" " + roller.getPlayerName() + " zar attı: " + diceResult
+                + " | Eski pozisyon: " + oldPos + " -> Yeni pozisyon: " + newPos);
 
         if (newPos == 100) {
+            System.out.println("Oyun bitti! Kazanan oyuncu: " + roller.getPlayerName());
             sendMessageToBoth("*** " + roller.getPlayerName() + " kazandı! ***");
             restartGame();
         } else {
@@ -130,15 +130,7 @@ public class GameSession {
     -Her iki client GUI’sine tahtayı sıfırlama komutu gider
     -GUI’de sadece sırası gelen oyuncunun zar butonu açılır
      */
- /*public void restartGame() {
-        playerPositions[0] = 0;
-        playerPositions[1] = 0;
-        currentPlayerIndex = 0;
-        // İlk oyuncu başlasın
-        currentPlayerIndex = 0;
-        sendMessageToBoth("RESET");
-        sendTurnInfo();
-    }*/
+
     public void restartGame() {
         playerPositions[0] = 0;
         playerPositions[1] = 0;

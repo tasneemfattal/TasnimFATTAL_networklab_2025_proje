@@ -1,3 +1,5 @@
+package snakesandladders;
+
 
 import java.awt.Point;
 

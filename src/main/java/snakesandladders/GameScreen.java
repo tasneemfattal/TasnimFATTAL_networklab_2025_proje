@@ -1,3 +1,5 @@
+package snakesandladders;
+
 
 import java.awt.Image;
 import java.io.BufferedReader;
