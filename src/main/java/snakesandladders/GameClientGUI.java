@@ -108,7 +108,7 @@ public class GameClientGUI extends javax.swing.JFrame {
         }
 
         try {
-            socket = new Socket("localhost", 1234); // AWS yerine şimdilik localhost ("16.171.162.245")
+            socket = new Socket("13.48.43.110", 1234); // AWS yerine şimdilik localhost ("13.48.43.110")
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

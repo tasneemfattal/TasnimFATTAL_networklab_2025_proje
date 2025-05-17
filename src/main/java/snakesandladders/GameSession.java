@@ -1,4 +1,4 @@
-package snakesandladders;
+ package snakesandladders;
 
 import java.util.Map;
 
