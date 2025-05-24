@@ -1,6 +1,5 @@
 package snakesandladders;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,7 +44,7 @@ public class ClientHandler extends Thread {
     private ArrayList<ClientHandler> waitingList; // Oyuncu eşleşmesini bekleyenler listesi
     private GameSession gameSession; // Bu oyuncunun dahil olduğu oyun oturumu
 
-   // private boolean  = false; // Oyuncu tekrar oynamak istiyor mu?
+    // private boolean  = false; // Oyuncu tekrar oynamak istiyor mu?
     private static int replayVotes = 0;     // Toplam tekrar isteği cevap sayısı
     private static int replayYesVotes = 0;  // Evet diyen oyuncu sayısı
 
@@ -69,7 +68,8 @@ public class ClientHandler extends Thread {
 
                 // Oyuncu eşleştirme işlemi yapılır
                 synchronized (waitingList) {
-                    waitingList.add(this);
+                    waitingList.removeIf(handler -> handler.clientSocket.isClosed());  // Bağlantısı kopmuş oyuncular varsa listeden çıkar
+                    waitingList.add(this);// ClientHandler nesnesi bekleyen oyuncular listesine eklenir; eşleşme 2 kişi olunca başlar
 
                     if (waitingList.size() >= 2) {
                         ClientHandler player1 = waitingList.remove(0);
@@ -119,18 +119,17 @@ public class ClientHandler extends Thread {
                         }
                     }
 
-                }  else if(input.equals("REPLAY_NO")) {
+                } else if (input.equals("REPLAY_NO")) {
                     synchronized (ClientHandler.class) {
                         //replayVotes++;
 
                         // Bir oyuncu tekrar oynamak istemiyorsa hemen oyunu sonlandır
-                       // if (replayVotes == 1) {
-                            gameSession.sendMessageToBoth("*** Oyun sonlandı. " + playerName + " tekrar oynamak istemedi. ***");
-                            gameSession.sendMessageToBoth("GAME_OVER");
-                           
+                        // if (replayVotes == 1) {
+                        gameSession.sendMessageToBoth("*** Oyun sonlandı. " + playerName + " tekrar oynamak istemedi. ***");
+                        gameSession.sendMessageToBoth("GAME_OVER");
 
-                            replayVotes = 0;
-                            replayYesVotes = 0;
+                        replayVotes = 0;
+                        replayYesVotes = 0;
                         //}
                     }
                 }
@@ -139,6 +138,10 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             System.out.println("Hata (ClientHandler): " + e.getMessage());
         } finally {
+            // Oyuncu çıkınca listeden temizle
+            synchronized (waitingList) {
+                waitingList.remove(this);
+            }
             // Oyuncu bağlantıdan çıkınca diğer oyuncuya haber ver
             if (gameSession != null) {
                 gameSession.sendMessageToBoth("Oyuncu " + playerName + " oyunu terk etti. Oyun sonlandırıldı.");
